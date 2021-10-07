@@ -6,7 +6,7 @@ class GridWorld:
         self.pe = .25
         self.numActions = 5
         self.gridSize = 5
-        self.block = ((1,1), (2,1), (1,3), (2,3))
+        self.block = np.array([(1,1), (2,1), (1,3), (2,3)])
         self.target = np.array([(2,0), (2,2)])
         self.position = np.array([2,4])
         
@@ -17,32 +17,36 @@ class GridWorld:
 
     @property
     def createState(self):
-        NotImplemented
+        gridSize = self.gridSize
+        return np.array([(i, j) for i in range(gridSize) for j in range(gridSize)])
     
     @property
-    def createProbability(self, state):
+    def createProbability(self):
         '''
         direction:
         1 2 3 4 5
         left right up down stay
         '''
-        actionSpace = None
-        blockSpace = None
-        stateSpace = None
+        actionSpace = self.action
+        blockSpace = self.block
+        stateSpace = self.state
         
-        prob = []
-        for action in actionSpace:
-            nextState = state + action
-            if nextState in stateSpace and nextState not in blockSpace:
-                prob.append(.2)
-            else:
-                prob.append(0)
-
-        return np.array(prob) / sum(prob)
+        probs = []
+        for state in stateSpace:
+            prob = []
+            for action in actionSpace:
+                nextState = state + action
+                if nextState in stateSpace and nextState not in blockSpace:
+                    prob.append(.2)
+                else:
+                    prob.append(0)
+                print(np.array(prob) / sum(prob))
+            probs.append(np.array(prob) / sum(prob))
+        return np.array(probs)
     
     @property
     def createAction(self):
-        NotImplemented
+        return np.array([(0, -1), (0, 1), (-1, 0), (1, 0), (0, 0)])
         
     @property
     def createObservation(self):
