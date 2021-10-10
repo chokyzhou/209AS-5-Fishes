@@ -28,16 +28,3 @@ class Simulator:
         i = random.randint(0,4)
         return actionset[i]
 
-
-    # def successor_state():
-    #     NotImplementedError
-
-    def transistion_probability(self):
-        #Notice the row index of transition prob matrix
-        # [forward, backward, left, right, stay]
-        transit_prob = []
-        for i in range(len(actionset)):
-            temp_state = np.multiply(self.successor_state_given_state,action_prob)
-            transit_prob.append(temp_state)
-        return np.array(transit_prob)
-

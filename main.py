@@ -4,6 +4,5 @@ from simulator import Simulator
 
 if __name__ == "__main__":
     grid = GridWorld()
-    simulator = Simulator(grid,[2,4])
-    transit_p = simulator.transistion_probability()
-    print(transit_p.shape)
+    print(grid.transition_probability.shape)
+    print(grid.transition_probability[4][0])

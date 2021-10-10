@@ -12,17 +12,23 @@ from numpy.lib.function_base import append
 
 class GridWorld:
     def __init__(self):
-        self.wind = .25 #pe
+        global actionSpace
+        global stateSpace
+        global blockSpace
+        global wind
+        global avail_ss
+
+        wind = .25 #pe
         self.numActions = 5
         self.gridSize = 5
-        self.block = np.array([(1,1), (1,2), (3,1), (3,2)])
+        blockSpace = np.array([(1,1), (1,2), (3,1), (3,2)])
         self.target = np.array([(2,0), (2,2)])
         self.position = np.array([2,4])
         
-        self.state = self.createState
-        self.action = self.createAction
-        self.prob_ss= self.pr_ss_s
-        self.prob_action = self.action_probability
+        stateSpace = self.createState
+        actionSpace = self.createAction
+        avail_ss= self.get_available_successor_state
+        self.transition_probability = self.create_transition_probability
         self.observation = self.createObservation
 
     @property
@@ -35,36 +41,70 @@ class GridWorld:
         return np.array(state_list)
     
     @property
-    def pr_ss_s(self): #probability of successor state given current state (25*25)
-        prob_ss = []
-
-        stateSpace = self.state
-        blockSpace = self.block
+    #construct a 25*25 matrix display all the availabale successor states given the current state
+    def get_available_successor_state(self):
+        avail_ss= []
 
         for curr_state in stateSpace:
-            temp_pr = []
+            temp_ = []
             if_block1 = (blockSpace == curr_state).all(1).any()
             for succ_state in stateSpace:
                 if if_block1 == True:
-                    temp_pr.append(0)
+                    temp_.append(0)
                 else:
                     if_block2 = (blockSpace == succ_state).all(1).any()
                     dist = np.linalg.norm(succ_state-curr_state)
                     if if_block2 == False and dist <= 1: #its impossible to move for more than one unit dist
-                        temp_pr.append(1)
+                        #available successor state is marked as 1
+                        temp_.append(1)
                     else:
-                        temp_pr.append(0)
-            temp_pr = np.array(temp_pr)
-            if sum(temp_pr)!= 0:
-                temp_pr = temp_pr/sum(temp_pr)
-            prob_ss.append(temp_pr)
-        return np.array(prob_ss)
+                        #unavailable successor state is marked as 0
+                        temp_.append(0)
+            temp_ = np.array(temp_)
+            avail_ss.append(temp_)
+        return np.array(avail_ss)
     
     @property
-    def action_probability(self): #only used as a weight for generating the transition probability
-        prob_action = (1 - self.wind) + self.wind/4 
-        #the overall probability of executing one action is same for every action in the Action set
-        return prob_action
+    def create_transition_probability(self): #Create Transition Probability Matrix 5*25*25
+        tran_pr = []
+        for action_ in actionSpace:
+            '''
+            Default policy: 
+            if the selected action is not available, the probaility of executing that action correctly is assigned to "Stay".
+                   eg1. Given "Forward" action, if only forward is not possible, p(stay) = (1-pe + pe/4)
+                   eg2. Given "Forward" action, if both forward and backward is not possible, p(stay) = (1-pe + pe/3)
+                   eg3. Given "Forward" action, if both left and right is not possible, p(stay) = pe/2
+
+            The function -- 'get_available_successor_state' is used to give the number of available actions and indexing
+            its corresponding state
+
+            Action Set Index --- [forward, backward, left, right, stay]
+            '''
+            index = 0
+            empty_copy = np.zeros((25,25))
+            for state_ in stateSpace:
+                desired_nextState = np.array(state_+action_)
+                available_actions = np.sum(avail_ss[index]) #get the number of available action
+                if(available_actions != 0):
+                    if_desired_exist = (stateSpace == desired_nextState).all(1).any()
+                    if if_desired_exist == True:
+                        available_actions -= 1 #refer to example 3
+                        for i in range(len(stateSpace)): #find the index of desired_nextState in the [25*1] array
+                            if np.array_equal(desired_nextState,stateSpace[i]):
+                                empty_copy[index][i] = 1-wind
+                                break
+                    elif if_desired_exist == False:
+                        for j in range(len(stateSpace)):
+                            if np.array_equal(state_, stateSpace[j]):
+                                empty_copy[index][j]= 1 - wind + wind/available_actions
+                    rest_available_state = np.where(avail_ss[index] == 1)
+                    for rest_index in rest_available_state[0]:
+                        if empty_copy[index][rest_index] == 0:
+                            empty_copy[index][rest_index] = wind/available_actions
+                index += 1
+            tran_pr.append(empty_copy)
+        return np.array(tran_pr)
+
     
     @property
     def createAction(self):
@@ -91,12 +131,12 @@ class GridWorld:
 
     
     
-# """
-# testing GridWorld
-# """   
+
 # if __name__ == "__main__":
 #     grid = GridWorld()
-    #print(grid.prob_ss)
+#     # print(grid.transition_probability.shape)
+#     print(grid.transition_probability[4][0])
+
 #     #for i in range(len(grid.probability)):
 #         #print(grid.probability[i], grid.state[i])
 #     print(grid.probability)
