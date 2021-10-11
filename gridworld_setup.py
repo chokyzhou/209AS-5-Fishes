@@ -7,27 +7,23 @@
      
 import numpy as np
 import random
+from numpy.core.shape_base import block
 
 from numpy.lib.function_base import append
 
 class GridWorld:
     def __init__(self):
-        global actionSpace
-        global stateSpace
-        global blockSpace
-        global wind
-        global avail_ss
-
-        wind = .25 #pe
+        self.wind = .25 #pe
         self.numActions = 5
         self.gridSize = 5
-        blockSpace = np.array([(1,1), (1,2), (3,1), (3,2)])
+        self.blockSpace = np.array([(1,1), (1,2), (3,1), (3,2)])
         self.target = np.array([(2,0), (2,2)])
         self.position = np.array([2,4])
         
-        stateSpace = self.createState
-        actionSpace = self.createAction
-        avail_ss= self.get_available_successor_state
+        # {S A P R H gama}
+        self.stateSpace = self.createState
+        self.actionSpace = self.createAction
+        self.avail_ss= self.get_available_successor_state
         self.transition_probability = self.create_transition_probability
         self.observation = self.createObservation
 
@@ -43,6 +39,8 @@ class GridWorld:
     @property
     #construct a 25*25 matrix display all the availabale successor states given the current state
     def get_available_successor_state(self):
+        stateSpace = self.stateSpace
+        blockSpace = self.blockSpace
         avail_ss= []
 
         for curr_state in stateSpace:
@@ -66,6 +64,11 @@ class GridWorld:
     
     @property
     def create_transition_probability(self): #Create Transition Probability Matrix 5*25*25
+        actionSpace = self.actionSpace
+        stateSpace = self.stateSpace
+        avail_ss = self.avail_ss
+        wind = self.wind
+
         tran_pr = []
         for action_ in actionSpace:
             '''

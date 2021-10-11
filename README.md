@@ -1,11 +1,10 @@
-## reworking week1
+## 209AS Code Base
 
-1. S
-2. A
+1. S --done
+2. A --done
 3. P 
 4. O --done
-5. 
-6. 
+
 
 Run main to get Transition probability Matrix
 
@@ -17,3 +16,6 @@ TRM---Shape:
  [action3, [25*25]]
  [action4, [25*25]]
  [action5, [25*25]]]
+
+ ## Known Issue
+ 1. ln 26 in gridworld_setup.py, function meaning is ambiguous
