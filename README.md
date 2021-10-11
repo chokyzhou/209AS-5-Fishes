@@ -16,6 +16,3 @@ TRM---Shape:
  [action3, [25*25]]
  [action4, [25*25]]
  [action5, [25*25]]]
-
- ## Known Issue
- 1. ln 26 in gridworld_setup.py, function meaning is ambiguous
