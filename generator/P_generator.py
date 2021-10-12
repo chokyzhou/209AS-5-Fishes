@@ -52,11 +52,11 @@ for y in range(N):
     for x in range(M):
         for k in range(5):
             for j in range(5):
-                if j == k:
-                    P[Convert.coo2str(x,y)][k][step(x,y,j,M,N)] += suc
-                else:
-                    P[Convert.coo2str(x,y)][k][step(x,y,j,M,N)] += err
+                if GW[Convert.coo2str(x,y)] == 1:
+                    if j == k:
+                        P[Convert.coo2str(x,y)][k][step(x,y,j,M,N)] += suc
+                    else:
+                        P[Convert.coo2str(x,y)][k][step(x,y,j,M,N)] += err
 
-print(P[Convert.coo2str(3,3)][0])
-print(P[Convert.coo2str(3,3)][1])
-print(P[Convert.coo2str(3,3)][3])
+with open("P.json", "w") as f:
+    json.dump(P, f)

@@ -8,5 +8,5 @@ class Convert:
         return "(" + str(x) + "," + str(y) + ")"
     
     def str2coo(s:str) -> tuple:
-        nums = re.findall(r"\d+", str)
-        return (nums[0],nums[1])
+        nums = re.findall(r"\d+", s)
+        return (int(nums[0]),int(nums[1]))
