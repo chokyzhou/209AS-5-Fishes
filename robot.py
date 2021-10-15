@@ -97,7 +97,7 @@ class Robot:
 
 
     def showPI(self):
-        actions = ["N", "U", "D", "L", "R"]
+        actions = ["⟲", "↑", "↓", "←", "→"]
 
         print("Value ==========================================================")
         Vstr = ""

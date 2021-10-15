@@ -10,8 +10,14 @@ with open("obstacle.json", "r") as f:
     obstacle = json.load(f)
 
 GW = {}
-M = int(input("please input the colum number:"))
-N = int(input("please input the row number:"))
+""" M = int(input("please input the colum number:"))
+N = int(input("please input the row number:")) """
+
+with open("size.json", "r") as f:
+    size = json.load(f)
+
+M = size["M"]
+N = size["N"]
 
 for y in range(N):
     for x in range(M):

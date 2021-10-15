@@ -24,8 +24,14 @@ def step(x, y, a, M, N):
 
 
 # build an initial P
-M = int(input("please input the colum number: "))
-N = int(input("please input the row number: "))
+""" M = int(input("please input the colum number: "))
+N = int(input("please input the row number: ")) """
+
+with open("size.json", "r") as f:
+    size = json.load(f)
+
+M = size["M"]
+N = size["N"]
 
 P = {}
 

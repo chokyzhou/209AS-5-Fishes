@@ -33,12 +33,16 @@ if __name__ == "__main__":
         R = json.load(f)
 
     # build an initial P
-    M = int(input("please input the colum number: "))
-    N = int(input("please input the row number: "))
+    with open("./generator/size.json", "r") as f:
+        size = json.load(f)
+
+    M = size["M"]
+    N = size["N"]
     
     system = System(S, A, R, P, 0.8, N, M)
 
 
     robot = Robot(system)
     robot.PI()
+
     

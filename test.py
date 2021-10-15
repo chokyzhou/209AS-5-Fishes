@@ -1,9 +1,10 @@
 from convert import Convert
 import json
-p = {1: 123, 2:2345}
 
-print(json.dumps(p))
+size = {
+    'M': 5,
+    'N': 5
+}
 
-p = json.loads(json.dumps(p))
-
-print(p)
+with open("test.json", "w") as f:
+    json.dump(size, f)

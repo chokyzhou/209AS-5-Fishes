@@ -15,8 +15,11 @@ import sys
 sys.path.append("../")
 from convert import Convert
 
-M = int(input("please input the colum number:"))
-N = int(input("please input the row number:"))
+with open("size.json", "r") as f:
+    size = json.load(f)
+
+M = size["M"]
+N = size["N"]
 
 S = []
 
