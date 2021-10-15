@@ -17,10 +17,12 @@ class Robot:
         
         while True:
             newV = {}
+            newPi = {}
 
             for s in self.system.getS:
 
                 maxV = -math.inf
+                bestAction = None
                 for a in self.system.getA:
                     tempV = 0
 
@@ -30,7 +32,9 @@ class Robot:
                     
                     if tempV > maxV:
                         maxV = tempV
+                        bestAction = a
                 newV[s] = maxV
+                newPi[s] = bestAction
 
             sumDiff = 0
             for s in self.system.getS:
@@ -41,7 +45,7 @@ class Robot:
             self.showV()
             if sumDiff < delta:
                 # need to ask how to generate a policy based on the value of sates
-                # TODO
+                self.Pi = newPi
                 break
 
 
