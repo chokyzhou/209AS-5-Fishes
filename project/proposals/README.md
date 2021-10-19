@@ -1,0 +1,1 @@
+Templates pulled from https://git.uclalemur.com/mehtank/proposal.git
