@@ -1,54 +1,59 @@
+import collections
+
 class Search:
     def __init__(self, target, N=8):
         self.target = target
-        self.actions = [[-2, 1], [-2, -1], [-1, 2], [-1, -2],
+        self.graph = self.createGraph(N)
+    
+    def createGraph(self, N):
+        actions = [[-2, 1], [-2, -1], [-1, 2], [-1, -2],
                         [2, 1], [2, -1], [1, 2], [1, -2]]
-        self.stateSpace = [(i,j) for i in range(N) for j in range(N)]
-        
-    def dfs(self, state, visited=set()):
-        target = self.target
-        stateSpace = self.stateSpace
-        actions = self.actions
-        res = []
-        
-        if state == target:
-            return [target]
-        
-        if state not in visited:
-            visited.add(state)
+        stateSpace = [(i,j) for i in range(N) for j in range(N)]
+
+        graph = collections.defaultdict(list)
+        for state in stateSpace:
             for action in actions:
                 nextState = (action[0]+state[0], action[1] + state[1])
                 if nextState in stateSpace:
-                    res = self.dfs(nextState)
-                    if res:
-                        res.append(state)
-                        return res
+                    graph[state].append(nextState)
+        return graph
+
+    def dfs(self, state, visited=set()):
+        graph = self.graph
+        target = self.target
+
+        if state == target:
+            return [target]
+        
+        if state in graph.keys() and state not in visited:
+            visited.add(state)
+            for nextState in graph[state]:
+                feedback = self.dfs(nextState, visited)
+                if feedback:
+                    return [state] + feedback
         return []
     
     def bfs(self, state):
+        graph = self.graph
         target = self.target
-        stateSpace = self.stateSpace
-        actions = self.actions
-
         stack = [[state, []]]
         visited = set()
+
         while stack:
             temp = []
             while stack:
-                state, path = stack.pop()
-                if state == target:
-                    return path
-                if state in visited or state not in stateSpace:
-                    continue
-                else:
-                    visited.add(state)
-                for action in actions:
-                    temp.append([(action[0]+state[0], action[1] + state[1]), path + [state]])
+                curState, curPath = stack.pop(0)
+                if curState == target:
+                    return curPath + [curState]
+                if curState not in visited:
+                    visited.add(curState)
+                    for nextState in graph[curState]:
+                        temp.append([nextState, curPath + [curState]])
             stack = temp
         return []
 
 if __name__ == '__main__':
     target = (0,0)
     search = Search(target, 8)
-    res = search.bfs((5,3))
+    res = search.dfs((5,3))
     print(res)
