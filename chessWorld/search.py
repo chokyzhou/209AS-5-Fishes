@@ -3,11 +3,23 @@ import heapq
 import math
 
 class Search:
-    def __init__(self, target, N=8):
+    def __init__(self, target, N=8, obstacles=[]):
+        """
+        @param target: target state
+        @param N: chess board size
+        @param obstacles: list of obstacles
+        return None
+        """
         self.target = target
+        self.obstacles = obstacles
         self.graph = self.createGraph(N)
     
     def createGraph(self, N):
+        """
+        create a graph for chess board
+        @param N: chess board size
+        return dict[list]
+        """
         actions = [[-2, 1], [-2, -1], [-1, 2], [-1, -2],
                         [2, 1], [2, -1], [1, 2], [1, -2]]
         stateSpace = [(i,j) for i in range(N) for j in range(N)]
@@ -21,13 +33,17 @@ class Search:
         return graph
 
     def dfs(self, state, visited=set()):
+        """
+        dfs implementation
+        """
         graph = self.graph
         target = self.target
+        obstacles = self.obstacles
 
         if state == target:
             return [target]
         
-        if state in graph.keys() and state not in visited:
+        if state in graph.keys() and state not in visited and state not in obstacles:
             visited.add(state)
             for nextState in graph[state]:
                 feedback = self.dfs(nextState, visited)
@@ -36,9 +52,13 @@ class Search:
         return []
     
     def bfs(self, state):
+        """
+        bfs implementation
+        """
         graph = self.graph
         target = self.target
         stack = [[state, []]]
+        obstacles = self.obstacles
         visited = set()
 
         while stack:
@@ -47,7 +67,7 @@ class Search:
                 curState, curPath = stack.pop(0)
                 if curState == target:
                     return curPath + [curState]
-                if curState not in visited:
+                if curState not in visited and curState not in obstacles:
                     visited.add(curState)
                     for nextState in graph[curState]:
                         temp.append([nextState, curPath + [curState]])
@@ -55,10 +75,14 @@ class Search:
         return []
 
     def Astar(self, state):
+        """
+        A* implementation
+        """
         def calcDistance(s1, s2):
             return abs(s1[0] - s2[0]) + abs(s1[1] - s2[1])
 
         graph = self.graph
+        obstacles = self.obstacles
         target = self.target
 
         open = [(0, state, [])]
@@ -71,7 +95,7 @@ class Search:
                 return path + [state]
             
             for nextState in graph[state]:
-                if nextState not in closed:
+                if nextState not in closed and nextState not in obstacles:
                     heapq.heappush(open, (calcDistance(nextState, target), nextState, path + [state]))                    
 
             closed.append(state)
@@ -80,6 +104,7 @@ class Search:
 
 if __name__ == '__main__':
     target = (0,0)
-    search = Search(target, 8)
+    obstacles=[(3,2)]
+    search = Search(target, 8, obstacles=obstacles)
     res = search.Astar((5,3))
     print(res)
