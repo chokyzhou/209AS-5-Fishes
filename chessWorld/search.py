@@ -1,4 +1,6 @@
 import collections
+import heapq 
+import math
 
 class Search:
     def __init__(self, target, N=8):
@@ -52,8 +54,32 @@ class Search:
             stack = temp
         return []
 
+    def Astar(self, state):
+        def calcDistance(s1, s2):
+            return abs(s1[0] - s2[0]) + abs(s1[1] - s2[1])
+
+        graph = self.graph
+        target = self.target
+
+        open = [(0, state, [])]
+        closed = []
+
+        while open:
+            _, state, path = heapq.heappop(open)
+
+            if state == target:
+                return path + [state]
+            
+            for nextState in graph[state]:
+                if nextState not in closed:
+                    heapq.heappush(open, (calcDistance(nextState, target), nextState, path + [state]))                    
+
+            closed.append(state)
+        return []
+
+
 if __name__ == '__main__':
     target = (0,0)
     search = Search(target, 8)
-    res = search.dfs((5,3))
+    res = search.Astar((5,3))
     print(res)
