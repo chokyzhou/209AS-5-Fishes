@@ -107,25 +107,20 @@ class Search:
         
         graph = self.graph
         target = self.target
-        G = {'V': set((state,)), 'E': set()}
+        G = {'V': set((state,)), 'E': collections.defaultdict(set)}
         
         while True:
             state_random = random.choice(list(graph.keys()))
-            if state_random in graph.keys():
-                state_nearest = min([(s,calcDistance(s, state_random)) for s in G['V']], key=lambda x:x[1])[0] # one-liner
+            state_nearest = min([(s,calcDistance(s, state_random)) for s in G['V']], key=lambda x:x[1])[0] # one-liner
+            if calcDistance(state_random, state_nearest) <= calcDistance((0,0), (2,1)):
                 G['V'].add((state_random))
-                G['E'].add((state_nearest, state_random))
-            
-            if state_random == target:
-                newGraph = collections.defaultdict(list)
-                TODO
-                for state in G['E']:
-                    newGraph[state[0]].append(state[1])
-                    newGraph[state[1]].append(state[0])
-                    self.graph = newGraph
-                
+                G['E'][state_nearest].add(state_random)
+                G['E'][state_random].add(state_nearest)
+        
+            if target in G['V']:
+                self.graph = G['E']
                 return self.dfs(state)
-
+            
 if __name__ == '__main__':
     target = (0,0)
     obstacles=[(1,3)]
