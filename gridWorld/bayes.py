@@ -2,13 +2,13 @@ import numpy as np
 import scipy.stats
 import json
 from system import System
+from convert import Convert
+import copy
 
 class Bayes:
     """
     Class Bayes implements Bayes filter.
 
-    TODO:
-    function read_believe_prior
     """
 
     def __init__(self, system, position=np.array([0, 0]), target=np.array([[4, 4], [4, 5]])) -> None:
@@ -16,8 +16,8 @@ class Bayes:
         self.pr_state_given_obs = None # pr(s|o)
         self.pr_state = None           # pr(s)
 
-        self.init_believe
         self.init_system(system, position, target)
+        self.init_believe
 
     def init_system(self, system, position, target):
         self.position = position       # initialize starting position
@@ -33,8 +33,11 @@ class Bayes:
     @property
     def init_believe(self):
         # Believe
-        self.believe_prior = None
-        self.believe_post = None
+        temp = np.zeros(self.size)
+        temp[tuple(self.position)] = 1
+        
+        self.believe_prior = copy.deepcopy(temp)
+        self.believe_post = copy.deepcopy(temp)
 
         self.dist = scipy.stats.norm(0, 1) # ini distribution
         
@@ -74,7 +77,7 @@ class Bayes:
 
         return dic 
         """
-        res = {}
+        res = np.empty(self.size)
         for state in self.stateSpace:
             res[state] = self.calObs(np.array(state))
 
@@ -90,12 +93,14 @@ class Bayes:
         RS, RD = self.target
         distance2RS = np.linalg.norm(position - RS)
         distance2RD = np.linalg.norm(position - RD)
+
         if not distance2RS:
             h = 2 / (1 / distance2RD)
         elif not distance2RD:
             h = 2 / (1 / distance2RS)
         else:
             h = 2 / (1 / distance2RS + 1 / distance2RD)
+
         return h
 
     def update_pr_obs_state(self):
@@ -132,15 +137,32 @@ class Bayes:
         # believe post observation is the probability of current state given observation, ie pr(s|o,*)
         self.believe_post = self.read_believe_post()              
 
-    def read_believe_prior(self):
+    def read_believe_prior(self, action=2):
         """
         Update Bel-
         
+        @param action
+        
+        return believe
+        
         TODO
         """
-        # 1. TODO include blocks
-        # 2. TODO assign getP to believe_prior
-        return 1
+        # TODO next state transition not assigned corrently
+        
+        P = self.system.getP
+        S = self.system.getS
+        A = self.system.getA
+
+        pr_map = np.zeros(self.size).T
+
+        for nextState in S:
+            for state in S:
+                for key, value in P[state][str(action)].items():
+                    if nextState == key:
+                        p = Convert.str2coo(nextState)
+                        pr_map[p] += value * self.believe_post[p[::-1]]
+
+        return pr_map.T
     
     def read_believe_post(self):
         """
@@ -148,7 +170,7 @@ class Bayes:
 
         return Bel+
         """
-        believe_post = np.dot(self.pr_state_given_obs, self.believe_prior)
+        believe_post = np.multiply(self.expected_obs, self.believe_prior)
         believe_post = believe_post / np.linalg.norm(believe_post.flatten()) # normalize
         return believe_post.reshape(self.size)
 
@@ -185,5 +207,4 @@ if __name__ == "__main__":
     system = System(S, A, R, P, 0.8, N, M)
     test = Bayes(system)
 
-    #print(test.get_state_estimate())
-    print(test.system.getA)
+    print(test.position)
