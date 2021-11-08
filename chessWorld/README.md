@@ -12,7 +12,7 @@ python search.py [serach method] [initial state] [goal state] [obstacle space]
 
 The program can be easily run by using command above. Additional input methods are listed below:
 
-Search Method: DFS, BFS, Astar, rrt
+Search Method: dfs, bfs, a*, rrt
 
 Initial State: Tuple
 
