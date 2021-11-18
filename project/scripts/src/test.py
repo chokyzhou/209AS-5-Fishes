@@ -1,8 +1,12 @@
+"""
+Use cart-pole to test algo
+"""
+
+import gym
 import time
-import flappy_bird_gym
 import numpy as np
-import collections
 import math
+import collections
 
 ### Initialize Q-learning
 epsilon = 0.1
@@ -50,7 +54,7 @@ def main():
          difference between the player's y position and the next hole's y position.
     """
     
-    env = flappy_bird_gym.make("FlappyBird-v0")
+    env = gym.make("CartPole-v0")
     bins, obsSpaceSize, qTable = create_bins_and_q_table(env)
     
     Q = collections.defaultdict(lambda: np.zeros(env.action_space.n))
