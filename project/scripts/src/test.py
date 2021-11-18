@@ -8,14 +8,7 @@ import numpy as np
 import math
 import collections
 
-### Initialize Q-learning
-epsilon = 0.1
-num_episodes = 10**10
 
-lr = .8
-gamma = .95
-eps = 0.02
-###
 
 def create_bins_and_q_table(env):
 	# env.observation_space.high
@@ -54,6 +47,15 @@ def main():
          difference between the player's y position and the next hole's y position.
     """
     
+    ### Initialize Q-learning
+    epsilon = 0.1
+    num_episodes = 10**10
+
+    lr = .8
+    gamma = .95
+    eps = 0.02
+    ###
+
     env = gym.make("CartPole-v0")
     bins, obsSpaceSize, qTable = create_bins_and_q_table(env)
     
@@ -64,6 +66,8 @@ def main():
         obs = env.reset()
         state = get_discrete_state(obs, bins, obsSpaceSize)
         done = False
+        
+        
         
         cnt = 0
         while not done:
@@ -88,6 +92,7 @@ def main():
 
             state = next_state
         
+        epsilon *= .99
         print(episode, {cnt})
         
     env.close()
