@@ -43,6 +43,9 @@ def get_discrete_state(state, bins, obsSpaceSize):
 		stateIndex.append(np.digitize(state[i], bins[i]) - 1) # -1 will turn bin into index
 	return tuple(stateIndex)
 
+def obs2state(a, b, multiplier=100):
+    return (int(math.ceil(a*multiplier)), int(math.ceil(b*multiplier)))
+
 
 def main():
     """
@@ -58,7 +61,8 @@ def main():
     for episode in range(num_episodes): 
 
         obs = env.reset()
-        state = get_discrete_state(obs, bins, obsSpaceSize)
+        #state = get_discrete_state(obs, bins, obsSpaceSize)
+        state = obs2state(*obs)
         done = False
         
         cnt = 0
@@ -71,20 +75,22 @@ def main():
 
             next_obs, reward, done, info = env.step(action)
             
-            next_state = get_discrete_state(next_obs, bins, obsSpaceSize)
+            #next_state = get_discrete_state(next_obs, bins, obsSpaceSize)
+            next_state = obs2state(*next_obs)
             
-            if done:
+            if done or not -10<next_state[1]<10:
                 reward = -1000
-                
+            
             Q[state][action] = (1 - lr) * Q[state][action] + lr * (reward + gamma * np.max(Q[next_state]))
             
-            if episode % 100 == 0:
+            if episode % 1000 == 0:
+                print(next_state)
                 env.render()
-                time.sleep(1 / 120)  # FPS
-
+                time.sleep(1 / 60)  # FPS
+            
             state = next_state
         
-        print(episode, {cnt})
+        print(episode, info)
         
     env.close()
 
