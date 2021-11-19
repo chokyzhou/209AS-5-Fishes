@@ -43,7 +43,7 @@ def get_discrete_state(state, bins, obsSpaceSize):
 		stateIndex.append(np.digitize(state[i], bins[i]) - 1) # -1 will turn bin into index
 	return tuple(stateIndex)
 
-def obs2state(a, b, multiplier=100):
+def obs2state(a, b, multiplier=10000):
     return (int(math.ceil(a*multiplier)), int(math.ceil(b*multiplier)))
 
 
@@ -66,6 +66,7 @@ def main():
         done = False
         
         cnt = 0
+        old_score = 0
         while not done:
             cnt += 1
             if np.random.uniform(0, 1) < epsilon:
@@ -78,18 +79,23 @@ def main():
             #next_state = get_discrete_state(next_obs, bins, obsSpaceSize)
             next_state = obs2state(*next_obs)
             
-            if done or not -10<next_state[1]<10:
-                reward = -1000
+            if done or not -10 < next_state[1] < 10:
+                reward = -10000
             
+            if info['score'] > old_score:
+                old_score = info['score']
+                reward = 100
+            else:
+                reward = 0
+                
             Q[state][action] = (1 - lr) * Q[state][action] + lr * (reward + gamma * np.max(Q[next_state]))
             
-            if episode % 1000 == 0:
-                print(next_state)
+            if episode % 5000 == 0:
                 env.render()
                 time.sleep(1 / 60)  # FPS
             
             state = next_state
-        
+            
         print(episode, info)
         
     env.close()
